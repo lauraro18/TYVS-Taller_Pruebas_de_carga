@@ -14,6 +14,7 @@ const DATA_FILE  = __ENV.DATA_FILE || null; // si no viene, el script intentará
 const SCENARIO   = (__ENV.SCENARIO || 'baseline').toLowerCase();
 const TIMEOUT_MS = Number(__ENV.TIMEOUT_MS || 2000);
 const SLEEP_MS   = Number(__ENV.SLEEP_MS || 0); // micro-pausa opcional entre iteraciones
+const RESULTS_DIR = __ENV.RESULTS_DIR || 'perf/results'; // carpeta del resumen
 
 /**
  * =========================
@@ -107,6 +108,21 @@ const ALL_SCENARIOS = {
     ],
     gracefulRampDown: '30s',
   },
+  /**
+   * Version corta de 'load' para cada pull request (~3 min): misma forma
+   * (rampa, sostener, bajar) a la mitad de VUs. 'load' completo dura 14 min
+   * y bloquearia la revision; se ejecuta on-demand.
+   */
+  load_pr: {
+    executor: 'ramping-vus',
+    startVUs: 0,
+    stages: [
+      { duration: '30s', target: 100 },
+      { duration: '2m', target: 100 },
+      { duration: '30s', target: 0 },
+    ],
+    gracefulRampDown: '30s',
+  },
   soak: {
     executor: 'constant-vus',
     vus: 100,
@@ -137,6 +153,8 @@ function buildOptions() {
     scenarios: {
       run: chosen || ALL_SCENARIOS['baseline'],
     },
+    // k6 por defecto no calcula p(99) en el resumen; el SLO lo necesita.
+    summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
     discardResponseBodies: false,
     noConnectionReuse: false,
   };
@@ -225,7 +243,7 @@ export default function () {
 export function handleSummary(data) {
   // Nombre de archivo según escenario
   const scen = SCENARIO || 'baseline';
-  const path = `perf/results/summary-${scen}.json`;
+  const path = `${RESULTS_DIR}/summary-${scen}.json`;
   return {
     [path]: JSON.stringify(data, null, 2),
   };

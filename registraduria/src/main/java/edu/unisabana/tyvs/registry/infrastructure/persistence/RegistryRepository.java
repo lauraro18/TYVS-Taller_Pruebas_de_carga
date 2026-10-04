@@ -3,11 +3,22 @@ package edu.unisabana.tyvs.registry.infrastructure.persistence;
 import edu.unisabana.tyvs.registry.application.port.out.RegistryRepositoryPort;
 import java.sql.*;
 import java.util.Optional;
+import javax.sql.DataSource;
 
 public class RegistryRepository implements RegistryRepositoryPort {
     private final String jdbcUrl;
     private final String username;
     private final String password;
+
+    /**
+     * Pool de conexiones (HikariCP). Si es null, se usa DriverManager y se abre
+     * una conexion nueva en cada operacion (comportamiento original, sin pool).
+     *
+     * Se deja la opcion sin pool a proposito: permite medir el "antes" y el
+     * "despues" con el MISMO jar, cambiando solo una propiedad
+     * (registry.pool.max-size=0). Asi la comparacion mide solo el efecto del pool.
+     */
+    private final DataSource dataSource;
 
     public RegistryRepository(String jdbcUrl) {
         this(jdbcUrl, "", "");
@@ -17,9 +28,23 @@ public class RegistryRepository implements RegistryRepositoryPort {
         this.jdbcUrl = jdbcUrl;
         this.username = username;
         this.password = password;
+        this.dataSource = null;
+    }
+
+    /** Variante con pool: las conexiones se toman prestadas y se devuelven al cerrar. */
+    public RegistryRepository(DataSource dataSource) {
+        this.jdbcUrl = null;
+        this.username = null;
+        this.password = null;
+        this.dataSource = dataSource;
     }
 
     private Connection getConnection() throws SQLException {
+        if (dataSource != null) {
+            // con pool: close() devuelve la conexion al pool, no la destruye
+            return dataSource.getConnection();
+        }
+        // sin pool: conexion nueva en cada operacion (defecto PERF-01)
         return DriverManager.getConnection(jdbcUrl, username, password);
     }
 

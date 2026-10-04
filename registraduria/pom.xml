@@ -55,6 +55,13 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
+    <!-- HikariCP: pool de conexiones JDBC (correccion del defecto PERF-01).
+         Version gestionada por spring-boot-dependencies 2.7.x (4.0.3). -->
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+    </dependency>
+
     <!-- Registro de Prometheus: sin esta dependencia /actuator/prometheus
          devuelve 404 aunque application.properties lo exponga. Version
          gestionada por spring-boot-dependencies. -->

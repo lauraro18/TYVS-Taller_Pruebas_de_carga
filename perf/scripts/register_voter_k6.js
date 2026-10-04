@@ -33,6 +33,8 @@ const SLEEP_MS = Number(__ENV.SLEEP_MS || 100);
 // Desplazamiento del rango de ids, para repetir la prueba sin reiniciar el
 // servicio. Ver el comentario largo en la funcion principal.
 const ID_BASE = Number(__ENV.ID_BASE || 0);
+// Carpeta donde handleSummary deja el resumen (p. ej. perf/results/sin-pool).
+const RESULTS_DIR = __ENV.RESULTS_DIR || 'perf/results';
 
 /* =========================
  * Métricas personalizadas
@@ -125,6 +127,21 @@ const ALL_SCENARIOS = {
     ],
     gracefulRampDown: '30s',
   },
+  /**
+   * Version corta de 'load' para cada pull request (~3 min): misma forma
+   * (rampa, sostener, bajar) a la mitad de VUs. 'load' completo dura 14 min
+   * y bloquearia la revision; se ejecuta on-demand.
+   */
+  load_pr: {
+    executor: 'ramping-vus',
+    startVUs: 0,
+    stages: [
+      { duration: '30s', target: 100 },
+      { duration: '2m', target: 100 },
+      { duration: '30s', target: 0 },
+    ],
+    gracefulRampDown: '30s',
+  },
   soak: {
     executor: 'constant-vus',
     vus: 100,
@@ -161,6 +178,8 @@ function buildOptions() {
     },
     scenarios: { run: chosen || ALL_SCENARIOS['baseline'] },
     // false: necesitamos el cuerpo para validar el resultado de negocio.
+    // k6 por defecto no calcula p(99) en el resumen; el SLO lo necesita.
+    summaryTrendStats: ['avg', 'min', 'med', 'p(90)', 'p(95)', 'p(99)', 'max'],
     discardResponseBodies: false,
     noConnectionReuse: false,
   };
@@ -259,6 +278,6 @@ export function handleSummary(data) {
     null,
     2
   );
-  out['perf/results/summary-voters-' + SCENARIO + '.json'] = JSON.stringify(data, null, 2);
+  out[RESULTS_DIR + '/summary-voters-' + SCENARIO + '.json'] = JSON.stringify(data, null, 2);
   return out;
 }
