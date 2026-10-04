@@ -78,3 +78,15 @@ k6 run --env BASE_URL=http://localhost:8080 --env SCENARIO=load perf/scripts/reg
 1. Primero errores y p95. Si no se cumplen, no tiene sentido mirar lo demás.
 2. Después, el p95 de k6 contra el p95 del servidor (`srv_p95_ms`). Si el servidor dice pocos milisegundos y k6 dice cientos, el tiempo se está yendo en cola, no en el código.
 3. Por último, hilos y pool: si los hilos de Tomcat llegan al máximo o hay conexiones pendientes, ahí está el cuello de botella.
+
+## Matriz de pruebas de rendimiento
+
+Medido en GitHub Actions (`ubuntu-latest`, JDK Temurin 17.0.20, k6 2.3.0), corrida [37227231392](https://github.com/lauraro18/TYVS-Taller_Pruebas_de_carga/actions/runs/37227231392). Servicio con HikariCP.
+
+| Escenario | Modelo | Duración | SLO | Resultado | Artefactos |
+|---|---|---|---|---|---|
+| Baseline | Cerrado, 20 VUs | 5 min | p95 < 300 ms, p99 < 800 ms, error < 1 % | **Cumple** · p95 1,64 ms · p99 2,29 ms · 0 % error | `results/con-pool/summary-voters-baseline.json` |
+| Carga | Cerrado, 0 → 200 VUs | 14 min | p95 < 300 ms, p99 < 800 ms, error < 1 % | **Cumple** · p95 1,93 ms · p99 3,06 ms · 0 % error | `results/con-pool/summary-voters-load.json` |
+| Estrés | Cerrado, 200 → 600 VUs | 10 min | p95 < 300 ms, p99 < 800 ms, error < 1 % | **Cumple** · p95 3,77 ms · p99 10,05 ms · 0 % error | `results/con-pool/summary-voters-stress.json` |
+
+La misma batería sin pool también cumple todos los SLO; la comparación completa, con el % de mejora y la comparación contra baseline, está en [`results/comparacion.md`](results/comparacion.md). Las gráficas se regeneran con `python perf/graficas.py`.

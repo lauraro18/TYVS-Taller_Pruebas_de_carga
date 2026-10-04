@@ -1,6 +1,8 @@
 
 # Taller de Pruebas de Carga y Rendimiento
 
+> **Entrega del equipo.** Plan, SLO y cómo ejecutar: [`perf/README.md`](perf/README.md) · Resultados: [`perf/results/comparacion.md`](perf/results/comparacion.md) · Defectos: [`defectos.md`](defectos.md) · Pipeline: [`.github/workflows/perf.yml`](.github/workflows/perf.yml) · Análisis completo en la **Wiki** del repositorio.
+
 Este taller tiene como objetivo aprender a **diseñar, implementar y ejecutar pruebas de carga y rendimiento** sobre un sistema tipo API/HTTP, aplicando buenas prácticas de ingeniería, análisis de resultados y automatización con CI.
 
 ---

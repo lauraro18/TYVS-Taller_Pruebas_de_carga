@@ -23,6 +23,7 @@ perf/results/*
 !perf/results/.gitkeep
 # ...excepto los resumenes de la entrega (pequenos y comparables entre corridas)
 !perf/results/comparacion.md
+!perf/results/graficas/
 !perf/results/sin-pool/
 !perf/results/con-pool/
 perf/results/sin-pool/*
