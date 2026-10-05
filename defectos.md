@@ -2,11 +2,8 @@
 
 Curso: Testing y Validación de Software\
 Proyecto: Pruebas de Carga y Rendimiento — Registraduría\
-Equipo: [Nombre del equipo]\
-Integrantes: [Integrantes]\
-Fecha: 4 de octubre de 2026
+Integrantes: Laura Sofia Rodriguez Gonzalez
 
-> El ejemplo del profesor quedó en el historial de Git; este archivo tiene **nuestros** hallazgos. Todas las cifras salen de la corrida 37227231392 de GitHub Actions y están en `perf/results/` (`comparacion.md`, `server-*.json`, `summary-voters-*.json`).
 
 ------------------------------------------------------------------------
 
